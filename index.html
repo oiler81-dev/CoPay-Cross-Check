@@ -5,36 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Copay Cross-Check</title>
   <link rel="stylesheet" href="styles.css" />
+
   <!-- SheetJS (read + write XLSX) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
+
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="logo">CC</div>
+      <div class="logo">LA</div>
       <div>
-        <div class="title">Copay Cross-Check</div>
-        <div class="subtitle">Upload two reports. Match by DOB + name. Verify copay collection.</div>
+        <div class="title">LAOSS Copay Cross-Check</div>
+        <div class="subtitle">Seen visits only. Match by DOB + fuzzy name. Verify copay collection.</div>
       </div>
     </div>
   </header>
 
   <main class="wrap">
-
     <section class="card">
       <h2>1) Upload reports</h2>
 
       <div class="grid2">
         <div class="upload">
-          <label class="label">Report A: Eligibility / Expected Copay</label>
+          <label class="label">Report A: PVerify / Eligibility Financial Summary</label>
           <input id="fileA" type="file" accept=".xlsx,.xls,.csv" />
           <div class="hint">Must include: Patient Name, DOB, Spec.Copay (In-Net), Location</div>
         </div>
 
         <div class="upload">
-          <label class="label">Report B: Patient Balance / Payments Collected</label>
+          <label class="label">Report B: AdvancedMD Patient Balance Report</label>
           <input id="fileB" type="file" accept=".xlsx,.xls,.csv" />
-          <div class="hint">Must include: Patient Name (First Last), Patient Birth Date, Patient Payments, Appointment User</div>
+          <div class="hint">Must include: Patient Name (First Last), Patient Birth Date, Patient Payments, Appointment User, Appointment Status</div>
         </div>
       </div>
 
@@ -50,7 +51,7 @@
 
       <div class="kpiRow">
         <div class="kpi">
-          <div class="kpiLabel">Patients with copay expected</div>
+          <div class="kpiLabel">Patients in scope (Seen + PVerify copay)</div>
           <div class="kpiValue" id="kpiPatients">0</div>
         </div>
         <div class="kpi">
@@ -110,7 +111,7 @@
 
         <div class="filter grow">
           <label class="label" for="searchBox">Search</label>
-          <input id="searchBox" type="text" placeholder="Type patient name, DOB, user..." />
+          <input id="searchBox" type="text" placeholder="Patient, DOB, user, status..." />
         </div>
       </div>
     </section>
@@ -158,13 +159,16 @@
           <tbody id="usersBody"></tbody>
         </table>
       </div>
-      <div class="hint">“Collected By” is pulled from the Patient Balance report’s Appointment User.</div>
-    </section>
 
+      <div class="hint">
+        Seen-only rule: patients must appear in AdvancedMD and have Appointment Status indicating Seen/Completed.
+        If they only appear in PVerify, they will not show up.
+      </div>
+    </section>
   </main>
 
   <footer class="footer">
-    <div>Local-only processing. Nothing uploads anywhere.</div>
+    <div>Runs locally in the browser. Nothing uploads anywhere.</div>
   </footer>
 
   <script src="app.js"></script>
