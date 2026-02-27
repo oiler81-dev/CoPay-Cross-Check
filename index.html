@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Copay Cross-Check</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- SheetJS (read + write XLSX) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CC</div>
+      <div>
+        <div class="title">Copay Cross-Check</div>
+        <div class="subtitle">Upload two reports. Match by DOB + name. Verify copay collection.</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="card">
+      <h2>1) Upload reports</h2>
+
+      <div class="grid2">
+        <div class="upload">
+          <label class="label">Report A: Eligibility / Expected Copay</label>
+          <input id="fileA" type="file" accept=".xlsx,.xls,.csv" />
+          <div class="hint">Must include: Patient Name, DOB, Spec.Copay (In-Net), Location</div>
+        </div>
+
+        <div class="upload">
+          <label class="label">Report B: Patient Balance / Payments Collected</label>
+          <input id="fileB" type="file" accept=".xlsx,.xls,.csv" />
+          <div class="hint">Must include: Patient Name (First Last), Patient Birth Date, Patient Payments, Appointment User</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="runBtn" class="btn primary">Run Cross-Check</button>
+        <button id="exportBtn" class="btn" disabled>Export Results to Excel</button>
+        <div id="status" class="status"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2) Summary</h2>
+
+      <div class="kpiRow">
+        <div class="kpi">
+          <div class="kpiLabel">Patients with copay expected</div>
+          <div class="kpiValue" id="kpiPatients">0</div>
+        </div>
+        <div class="kpi">
+          <div class="kpiLabel">Collected (count)</div>
+          <div class="kpiValue" id="kpiCollectedCount">0</div>
+        </div>
+        <div class="kpi">
+          <div class="kpiLabel">Partial (count)</div>
+          <div class="kpiValue" id="kpiPartialCount">0</div>
+        </div>
+        <div class="kpi">
+          <div class="kpiLabel">Not collected (count)</div>
+          <div class="kpiValue" id="kpiNotCollectedCount">0</div>
+        </div>
+      </div>
+
+      <div class="kpiRow">
+        <div class="kpi">
+          <div class="kpiLabel">Expected total</div>
+          <div class="kpiValue" id="kpiExpectedTotal">$0.00</div>
+        </div>
+        <div class="kpi">
+          <div class="kpiLabel">Collected total</div>
+          <div class="kpiValue" id="kpiCollectedTotal">$0.00</div>
+        </div>
+        <div class="kpi">
+          <div class="kpiLabel">Not collected total</div>
+          <div class="kpiValue" id="kpiNotCollectedTotal">$0.00</div>
+        </div>
+        <div class="kpi">
+          <div class="kpiLabel">Avg match confidence</div>
+          <div class="kpiValue" id="kpiAvgConfidence">0</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3) Filters</h2>
+
+      <div class="filters">
+        <div class="filter">
+          <label class="label" for="statusFilter">Status</label>
+          <select id="statusFilter">
+            <option value="All">All</option>
+            <option value="Collected">Collected</option>
+            <option value="Partial">Partial</option>
+            <option value="Not Collected">Not Collected</option>
+          </select>
+        </div>
+
+        <div class="filter">
+          <label class="label" for="locationFilter">Location</label>
+          <select id="locationFilter">
+            <option value="All">All locations</option>
+          </select>
+        </div>
+
+        <div class="filter grow">
+          <label class="label" for="searchBox">Search</label>
+          <input id="searchBox" type="text" placeholder="Type patient name, DOB, user..." />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4) Patient results</h2>
+
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>DOB</th>
+              <th>Location</th>
+              <th>Expected</th>
+              <th>Collected</th>
+              <th>Status</th>
+              <th>Collected By</th>
+              <th>Match Confidence</th>
+              <th>Match Notes</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>5) Per-user breakdown</h2>
+
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Collected (count)</th>
+              <th>Partial (count)</th>
+              <th>Not Collected (count)</th>
+              <th>Expected Total</th>
+              <th>Collected Total</th>
+              <th>Not Collected Total</th>
+              <th>Avg Confidence</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+      <div class="hint">“Collected By” is pulled from the Patient Balance report’s Appointment User.</div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div>Local-only processing. Nothing uploads anywhere.</div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
